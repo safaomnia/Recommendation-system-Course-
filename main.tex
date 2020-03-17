@@ -1,0 +1,122 @@
+\documentclass[11pt,fleqn]{book} % Default font size and left-justified equations
+
+%----------------------------------------------------------------------------------------
+
+\input{structure} % Insert the commands.tex file which contains the majority of the structure behind the template
+
+\begin{document}
+%----------------------------------------------------------------------------------------
+%	CHAPTER 1
+%----------------------------------------------------------------------------------------
+\chapterimage{background} % Chapter heading image
+\chapter{Le filtrage Collaboratif}
+Le filtrage collaboratif est l’ensemble des techniques qui ignorent les attributs utilisateur et élément, mais se concentrent sur les interactions utilisateur-élément. Il existe deux types de système de recommandation de filtrage collaboratif : le filtrage basé sur l’utilisateur (user-based filtering) et le filtrage basé sur les éléments (item-based filtering).
+\section{User-based filtering}
+User-based filtering trouve des utilisateurs similaires et leur donne des recommandations en fonction de ce que d'autres personnes ayant des modèles de consommation similaires ont apprécié.
+\subsection{Distance de Manhattan}
+Si les données sont denses (presque tous les attributs ont des valeurs non nulles) alors Manhattan est raisonnable à utiliser.
+\vspace{2mm}
+\begin{theorem}[Manhattan Distance]
+$$
+d(x,y) = \sum_{k=1}^n|\mathbf{x}_k - \mathbf{y}_k|
+$$
+\end{theorem}
+\inputpython{Python/manhatten.py}{1}{13}
+\subsection{Distance de Euclidean}
+Si les données sont denses alors Euclidienne est raisonnable à utiliser aussi.
+\vspace{2mm}
+\begin{theorem}[Euclidean Distance]
+$$
+d(x,y) =\sqrt{\sum_{k=1}^n(\mathbf{x}_k - \mathbf{y}_k)^2}
+$$
+\end{theorem}
+\inputpython{Python/euclidean.py}{1}{13}
+\vspace{2mm}
+
+\subsection{Distance de Minkowski Metric}
+Si les données sont denses alors Minkowski est raisonnable à utiliser aussi, ce qui peut être considéré comme une généralisation à la fois de la distance Euclidienne et de la distance de Manhattan.
+\vspace{3mm}
+\begin{theorem}[Minkowski Distance Metric]
+\begin{align}
+    d(x,y) =(\sum_{k=1}^n|\mathbf{x}_k - \mathbf{y}_k|^r)^\frac{1}{r} \quad\text{si r > 2 }\rightarrow{\text{Minkowski Distance Metric}}\\
+    d(x,y) =\sqrt{\sum_{k=1}^n(\mathbf{x}_k - \mathbf{y}_k)^2}\quad\text{si r = 2 }\rightarrow{\text{Euclidean Distance}}\\
+    d(x,y) = \sum_{k=1}^n|\mathbf{x}_k - \mathbf{y}_k|\quad\text{si r = 1 }\rightarrow{\text{Manhatten Distance}}
+\end{align}
+\end{theorem}
+\inputpython{Python/minkoski.py}{1}{14}
+\subsection{Pearson Correlation Coefficient}
+Si les données sont sujettes à l'inflation des notes (différents utilisateurs peuvent utiliser des échelles différentes), utilisez Pearson.
+\vspace{3mm}
+\begin{theorem}[Pearson Correlation Coefficient]
+$$
+    r =\dfrac{\sum_{i=1}^n(\mathbf{x}_i - \bar{\mathbf{x}})(\mathbf{y}_i - \bar{\mathbf{y}})}{\sqrt{\sum_{i=1}^n(\mathbf{x}_i - \bar{\mathbf{x}})^2}\sqrt{\sum_{i=1}^n(\mathbf{y}_i - \bar{\mathbf{y}})^2}}
+$$
+ou bien dans une autre formule moin complex:
+$$
+r = \dfrac{\sum_{i=1}^n\mathbf{x}_i\mathbf{y}_i - \dfrac{\sum_{i=1}^n\mathbf{x}_i\sum_{i=1}^n\mathbf{y}_i}{n}}{\sqrt{\sum_{i=1}^n\mathbf{x}_i^2 - \dfrac{(\sum_{i=1}^n\mathbf{x}_i)^2}{n}}\sqrt{\sum_{i=1}^n\mathbf{y}_i^2 - \dfrac{(\sum_{i=1}^n\mathbf{y}_i)^2}{n}}}
+$$
+\end{theorem}
+\inputpython{Python/pearson.py}{1}{30}
+
+\subsection{Similarité de Cosine}
+Si les données sont rares, utilisez Cosine Similarity.
+\vspace{3mm}
+\begin{theorem}[Cosine Similarity]
+\begin{align}
+    cos(x,y) =\dfrac{\mathbf{x} \cdot \mathbf{y}}{||\mathbf{x}|| \times ||\mathbf{y}||}
+   \quad{\hspace{2mm} \text{avec \hspace{1mm}} \mathbf{x} \cdot \mathbf{y} = \sum_{k=1}^n\mathbf{x}_k\mathbf{y}_k \text{\hspace{1mm} et \hspace{1mm}} ||\mathbf{x}|| = \sqrt{\sum_{k=1}^nx^2},\hspace{1mm} ||\mathbf{y}|| = \sqrt{\sum_{k=1}^ny^2}}
+\end{align}
+\end{theorem}
+
+\inputpython{Python/cos.py}{1}{30}
+
+\subsection{Implémentation nearest neighbor et recommend fonctions}
+\inputpython{Python/recommandation.py}{1}{50}
+\subsection{K-nearest neighbor }
+\vspace{3mm}
+\begin{theorem}
+\begin{align}
+    & inf(\mathbf{X}_i) =\dfrac{\mathbf{P}_i}{\sum_{i=1}^n\mathbf{P}_i}
+   \quad{\hspace{2mm} \Rightarrow{\text{ Calcule l'influence pour obtenir projected rating}}}\\
+   & Projected-Rating =\sum_{i=1}^n(\mathbf{R}_i \cdot inf(\mathbf{X}_i))
+\end{align}
+\end{theorem}
+\inputpython{Python/knn.py}{1}{31}
+\section{Item-based filtering}
+Item-based filtering trouve des modèles de similitude entre les éléments et les recommande aux utilisateurs sur la base des informations calculées.
+\subsection{Similarité de Adjusted Cosine}
+\vspace{3mm}
+\begin{theorem}[Adjusted Cosine Similarity]
+\begin{align*}
+    & s(i,j) =\dfrac{\sum_{u=1}^n(\mathbf{R}_{u,j} - \bar{\mathbf{R}}_u)(\mathbf{R}_{u,i}- \bar{\mathbf{R}}_u)}{\sqrt{\sum_{u=1}^n(\mathbf{R}_{u,j} - \bar{\mathbf{R}_u})^2}\sqrt{\sum_{u=1}^n(\mathbf{R}_{u,i} - \bar{\mathbf{R}}_u)^2}}
+   \quad{\text{avec \hspace{1mm}} \bar{\mathbf{R}}_u =\dfrac{ \sum_{u=1}^n\mathbf{R}_u}{n}}\\
+   & \Rightarrow{\text{Pour déterminer la similitude entre les éléments.}}
+\end{align*}
+\begin{align*}
+    & p(u,i) =\dfrac{ \sum_{N \in similarTo(i)}(\mathbf{S}_{i,N} \times \mathbf{SN}_{u,N})}{\sum_{N \in similarTo(i)}(|\mathbf{S}_{i,N}|)}\\
+   & \Rightarrow{\text{Pour obtenir une note dans l'intervalle [-1,1].}}
+\end{align*}
+\begin{align*}
+    & \mathbf{R}_{u,N}=\dfrac{1}{2} ((\mathbf{RN}_{u,N}+1)(\mathbf{Max}_g+\mathbf{Min}_g)) +\mathbf{Min}_g \\
+   & \Rightarrow{\text{Pour obtenir une note dans l'intervalle [1,5].}}
+\end{align*}
+\end{theorem}
+\inputpython{Python/adjustcos.py}{1}{30}
+\subsection{Slope one}
+Cette similarité compose deux parties :
+\subsubsection{Partie 1: Calcule de déviation}
+\vspace{3mm}
+\begin{theorem}
+$$
+    dev_{i,j} = \sum_{u \in S_{i,j}}\dfrac{\mathbf{u}_{i}-\mathbf{u}_{j}}{card(\mathbf{S}_{i,j}(\mathbf{X}))}
+$$
+\end{theorem}
+\subsubsection{Partie 2: Prédiction}
+\vspace{3mm}
+\begin{theorem}
+$$
+    p(u)_{j} =\dfrac{\sum_{u \in S(u)-{j}}(\mathbf{dev}_{i,j} + \mathbf{u}_{i})\mathbf{c}_{i,j}}{\sum_{u \in S(u)-j}\mathbf{c}_{i,j}}
+   \quad{\text{avec \hspace{1mm}} \mathbf{c}_{i,j} = card(\mathbf{S}_{i,j}(\mathbf{X}))} 
+$$
+\end{theorem}
+\end{document}
